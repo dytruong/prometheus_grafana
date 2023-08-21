@@ -66,6 +66,21 @@ services:
       - monitor-net
     labels:
       org.label-schema.group: "monitoring"
+  
+  blackbox_exporter:
+    image: prom/blackbox-exporter
+    restart: always
+    tty: true
+    ports:
+      - 9115:9115
+    dns: 8.8.8.8
+    command: --config.file=/etc/blackbox/blackbox.yml
+    expose:
+      - 9115
+    volumes:
+      - ./config/blackbox/:/etc/blackbox/
+    networks:
+      - default
 
   cadvisor:
     image: gcr.io/google-containers/cadvisor:v0.34.0
@@ -113,21 +128,22 @@ services:
     labels:
       org.label-schema.group: "monitoring"
 
-  caddy:
-    image: stefanprodan/caddy
-    container_name: caddy
-    ports:
-      - "3000:3000"
-      - "9090:9090"
-      - "9093:9093"
-      - "9091:9091"
-    volumes:
-      - ./caddy:/etc/caddy
-    environment:
-      - ADMIN_USER=${ADMIN_USER}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-    restart: unless-stopped
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
+  # caddy:
+  #   image: stefanprodan/caddy
+  #   container_name: caddy
+  #   ports:
+  #     - "3000:3000"
+  #     - "9090:9090"
+  #     - "9093:9093"
+  #     - "9091:9091"
+  #     - "9115:9115"
+  #   volumes:
+  #     - ./caddy:/etc/caddy
+  #   environment:
+  #     - ADMIN_USER=${ADMIN_USER}
+  #     - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+  #   restart: unless-stopped
+  #   networks:
+  #     - monitor-net
+  #   labels:
+  #     org.label-schema.group: "monitoring"
